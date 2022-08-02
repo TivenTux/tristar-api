@@ -8,7 +8,9 @@ Edit controllerphppath in constants.py, to point to your webserver hosting contr
 
 Requires any webserver, pyppeteer, flask, waitress and chrome.
 
-Run scrape_tristar.py with cron, on the frequency you need to update the data.
+Run scrape_tristar.py with cron, on the frequency you need to update the data.  
+
+tristar_api.py will provide api endpoint under http://yourip:5715/tristar  
 
 ### kernel
 some distros might need this for chrome sandbox support on kernel 
