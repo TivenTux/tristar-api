@@ -1,6 +1,7 @@
 # REST API for tristar solar controllers
 
-Useful for convenient access with smart home systems, logging, etc.  
+Useful for convenient access with smart home systems, logging, etc.   
+It is recommended to use a webserver and proxy the traffic to flask and to your solar controller.  
 
 
 Edit ip_tristar="ip:port" and point to your solar charger, in controller.php  
@@ -10,7 +11,8 @@ Requires any webserver, pyppeteer, flask, waitress and chrome.
 
 Run scrape_tristar.py with cron, on the frequency you need to update the data.  
 
-tristar_api.py will provide api endpoint under http://yourip:5715/tristar  
+tristar_api.py will provide api endpoint under ``http://your_IP:5715/tristar``  
+
 
 ### kernel
 some distros might need this for chrome sandbox support on kernel 
