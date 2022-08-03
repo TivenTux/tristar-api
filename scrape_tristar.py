@@ -15,7 +15,7 @@ def get_weather():
             return 'n/a', 'n/a'
         response = requests.get((weatherapiurl_base + 'lat=' + str(lat.replace(',', '.')) + '&' + 'lon=' + str(lon.replace(',', '.'))), timeout=5, headers=headers)
         payload = json.loads(response.text)
-        return payload['properties']['timeseries'][0]['data']['instant']['details']['air_temperature'], payload['properties']['timeseries'][0]['data']['instant']['details']['cloud_area_fraction']
+        return str(payload['properties']['timeseries'][0]['data']['instant']['details']['air_temperature']) + 'C', payload['properties']['timeseries'][0]['data']['instant']['details']['cloud_area_fraction']
     except Exception as e:
         print(e)
     return 'n/a', 'n/a'
@@ -29,7 +29,7 @@ def get_solar():
         payload = json.loads(response.text)
         tomorrow = datetime.now() + timedelta(days=1)
         tomorrowdate = tomorrow.strftime('%Y-%m-%d')
-        return payload['result']['watt_hours_day'][(time.strftime('%Y-%m-%d'))], payload['result']['watt_hours_day'][tomorrowdate]
+        return str(payload['result']['watt_hours_day'][(time.strftime('%Y-%m-%d'))]) + 'W', str(payload['result']['watt_hours_day'][tomorrowdate]) + 'W'
     except Exception as e:
         print(e)
     return 'n/a', 'n/a'
@@ -170,14 +170,15 @@ async def scrape_and_update():
                     print(e)   
             else:
                 productiontoday, productiontomorrow = load_data('solar')
-                print('using cached solar data')            
+                print('using cached solar data')   
+        #check if webserver is setup correctly         
         try:
-            webserver_status = check_webserver(controllerphppath)   
+            webserver_status = check_webserver(controllerphppath)  
         except Exception as e:
             webserverfound = 'error'
             print(e)
-        if webserverfound == 'error':
-            print('webserver not running or phppath incorrect')
+        if webserverfound == 'error' or webserver_status != True:
+            print('webserver error or phppath incorrect')
             return
         #please ensure chrome is installed and the correct directory set in constants
         browser = await launch(executablePath=chromepath, headless=True, args= [])
