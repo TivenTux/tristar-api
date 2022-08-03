@@ -1,13 +1,12 @@
 # REST API for tristar solar controllers
 
-Useful for convenient access with smart home systems, logging, etc.   
+Useful for convenient access with smart home systems, graphing, logging, etc. Should work with most, if not all, [MorningStar](https://www.morningstarcorp.com/) products.  
 It is recommended to use a webserver and proxy the traffic to flask and to your solar controller.  
 
+Requires any webserver (with php), pyppeteer, flask, waitress (pip) and chrome or chromium.  
 
 Edit ip_tristar="ip:port" and point to your solar charger, in controller.php  
-Edit controllerphppath in constants.py, to point to your webserver hosting controller.php  
-
-Requires any webserver, pyppeteer, flask, waitress and chrome.
+Edit controllerphppath in constants.py, to point to your webserver that is hosting controller.php  
 
 Run scrape_tristar.py with cron, on the frequency you need to update the data.  
 
