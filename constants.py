@@ -1,5 +1,5 @@
 #location of your webserver, hosting controller.php
-controllerphppath = 'http://192.168.1.4/controller.php'
+controllerphppath = 'http://192.168.50.40/controller.php'
 #if the enviroment is set correctly this should be fine, otherwise use absolute path here
 database = './controller.db'
 #please ensure chrome is installed and the correct directory set here
@@ -8,8 +8,8 @@ chromepath = '/usr/bin/google-chrome'
 #physical location of solar installation - for live weather data and estimated production
 #change from 'n/a' to enable
 #you can find coordinates for your location on websites such as https://www.latlong.net/ or https://www.gps-coordinates.net/
-lat='37.983810'
-lon='23.727539'
+lat='n/a'
+lon='n/a'
 
 #solar installation settings - change from 'n/a' to enable
 #will produce estimated power stats
