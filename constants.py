@@ -1,9 +1,26 @@
 #location of your webserver, hosting controller.php
-controllerphppath = 'http://192.168.50.40/controller.php'
+controllerphppath = 'http://192.168.1.4/controller.php'
 #if the enviroment is set correctly this should be fine, otherwise use absolute path here
 database = './controller.db'
 #please ensure chrome is installed and the correct directory set here
 chromepath = '/usr/bin/google-chrome'
+
+#physical location of solar installation - for live weather data and estimated production
+#change from 'n/a' to enable
+#you can find coordinates for your location on websites such as https://www.latlong.net/ or https://www.gps-coordinates.net/
+lat='37.983810'
+lon='23.727539'
+
+#solar installation settings - change from 'n/a' to enable
+#will produce estimated power stats
+#plane declination, 0 is horizontal 90 is vertical
+declination = 'n/a'
+#plane azimuth, -180 to 180 (-180 = north, -90 = east, 0 = south, 90 = west, 180 = north)
+azimuth = 'n/a'
+#installed modules power in kilo watt (1 = 1000Watts, 0.43 = 430Watts)
+kwatts_production = 'n/a'
+
+weatherapiurl_base = 'https://api.met.no/weatherapi/locationforecast/2.0/compact?'
 
 batteryvoltagediv = 'body > div:nth-child(1)'
 targetvoltagediv = 'body > div:nth-child(2)'
@@ -31,3 +48,5 @@ inputpowerdiv = 'body > div:nth-child(23)'
 ledstatusdiv = 'body > div:nth-child(24)'
 batterypolesvoltagediv = 'body > div:nth-child(25)'
 batterysensorvoltagediv = 'body > div:nth-child(26)'
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36'}
+pypp_user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36'

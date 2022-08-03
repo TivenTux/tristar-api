@@ -14,7 +14,7 @@ def load_data():
     , batterytemp, controllertemp, kilowatthours, status, absorption, balance
     , float, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily
     , maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage
-    , batterysensorvoltage FROM tristar WHERE id = ?''',
+    , batterysensorvoltage, locationtemp, locationcloud FROM tristar WHERE id = ?''',
             (0,),
         ).fetchall()
         batteryvoltage = rows[0][0]
@@ -43,17 +43,19 @@ def load_data():
         led = rows[0][23]
         batterypolesvoltage = rows[0][24]
         batterysensorvoltage = rows[0][25]
+        locationtemp = rows[0][26]
+        locationcloud = rows[0][27]
 
                                           
     except Exception as e:
         print(e)
-    return batteryvoltage, targetvoltage, chargingcurrent, arrayvoltage, arraycurrent, outputpower, sweepvmp, sweepvoc, sweeppmax, batterytemp, controllertemp, kilowatthours, status, absorptionduration, balanceduration, floatduration, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily, maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage, batterysensorvoltage
+    return batteryvoltage, targetvoltage, chargingcurrent, arrayvoltage, arraycurrent, outputpower, sweepvmp, sweepvoc, sweeppmax, batterytemp, controllertemp, kilowatthours, status, absorptionduration, balanceduration, floatduration, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily, maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage, batterysensorvoltage, locationtemp, locationcloud
 
 app = Flask(__name__)
-@app.route('/tristar')
+@app.route('/tristar', methods=['GET'])
 #tristar endpoint
 def tristar():
-    batteryvoltage, targetvoltage, chargingcurrent, arrayvoltage, arraycurrent, outputpower, sweepvmp, sweepvoc, sweeppmax, batterytemp, controllertemp, kilowatthours, status, absorptionduration, balanceduration, floatduration, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily, maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage, batterysensorvoltage = load_data()
+    batteryvoltage, targetvoltage, chargingcurrent, arrayvoltage, arraycurrent, outputpower, sweepvmp, sweepvoc, sweeppmax, batterytemp, controllertemp, kilowatthours, status, absorptionduration, balanceduration, floatduration, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily, maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage, batterysensorvoltage, locationtemp, locationcloud = load_data()
 
     return jsonify({'Battery Voltage': batteryvoltage, 'Target Voltage': targetvoltage, 'Charging Current': chargingcurrent,
                     'Array Voltage': arrayvoltage, 'Array Current': arraycurrent, 'Output Power': outputpower,
@@ -61,7 +63,7 @@ def tristar():
                     'Kilowatt Hours': kilowatthours, 'Controller Status': status, 'Absorption': absorptionduration, 'Equalization': balanceduration,  'Float': floatduration, 
                     'Max Energy daily': maxenergydaily, 'Ampere Hours daily': amperehoursdaily, 'Watt Hours daily': watthoursdaily, 'Max Voltage daily': maxvoltagedaily,  
                     'Max Battery Voltage daily': maxbatteryvoltagedaily, 'Min Battery Voltage daily': minbatteryvoltagedaily, 'Input Power': inputpower, 'LED Status': led,
-                    'Battery Poles Voltage': batterypolesvoltage, 'Battery Sensor Voltage': batterysensorvoltage})
+                    'Battery Poles Voltage': batterypolesvoltage, 'Battery Sensor Voltage': batterysensorvoltage, 'Temperature': locationtemp, 'Cloud Cover': locationcloud})
 
 #app.run(host='0.0.0.0', port=5715)
 
