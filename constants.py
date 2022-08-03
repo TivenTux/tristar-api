@@ -7,7 +7,8 @@ chromepath = '/usr/bin/google-chrome'
 #enable weather and solar production by changing to 'on'
 weather = 'off'
 solarproduction = 'off'
-
+#temperature option - C for Celcius F for Fahrenheit
+temppreference = 'C'
 #physical location of solar installation - for live weather data and estimated production
 #change from 'n/a' to enable
 #you can find coordinates for your location on websites such as https://www.latlong.net/ or https://www.gps-coordinates.net/
