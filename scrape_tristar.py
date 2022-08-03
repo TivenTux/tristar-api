@@ -1,5 +1,5 @@
-import time, os, random, requests, json
-import asyncio, datetime
+import time, os, random, requests, json, asyncio
+from datetime import datetime, timedelta
 import urllib.request, sqlite3
 from pyppeteer import launch
 from constants import *
@@ -20,13 +20,27 @@ def get_weather():
         print(e)
     return 'n/a', 'n/a'
 
+#get solar production data
+def get_solar():
+    try:
+        if lat == 'n/a' or lon == 'n/a' or azimuth == 'n/a' or kwatts_production == 'n/a' or declination == 'n/a':
+            return 'n/a', 'n/a'
+        response = requests.get((solarapiurl_base + str(lat.replace(',', '.')) + '/' + str(lon.replace(',', '.')) + '/' + str(declination) + '/' + str(azimuth) + '/' + str(kwatts_production)), timeout=5, headers=headers)
+        payload = json.loads(response.text)
+        tomorrow = datetime.now() + timedelta(days=1)
+        tomorrowdate = tomorrow.strftime('%Y-%m-%d')
+        return payload['result']['watt_hours_day'][(time.strftime('%Y-%m-%d'))], payload['result']['watt_hours_day'][tomorrowdate]
+    except Exception as e:
+        print(e)
+    return 'n/a', 'n/a'
+
 #push updates to database
 async def update_data(recordid, batteryvoltage, targetvoltage, chargingcurrent
     , arrayvoltage, arraycurrent, outputpower, sweepvmp, sweepvoc, sweeppmax
     , batterytemp, controllertemp, kilowatthours, status, absorption, balance
     , controllerfloat, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily
     , maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage
-    , batterysensorvoltage, locationtemp, locationcloud):
+    , batterysensorvoltage, locationtemp, locationcloud, productiontoday, productiontomorrow):
 
     connection = sqlite3.connect(database, isolation_level=None)
     cur = connection.cursor()
@@ -39,13 +53,13 @@ async def update_data(recordid, batteryvoltage, targetvoltage, chargingcurrent
     , batterytemp, controllertemp, kilowatthours, status, absorption, balance
     , float, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily
     , maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage
-    , batterysensorvoltage, locationtemp, locationcloud) = (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) WHERE id = ?'''
+    , batterysensorvoltage, locationtemp, locationcloud, productiontoday, productiontomorrow) = (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) WHERE id = ?'''
             s1 = cur.execute(sql1, (batteryvoltage, targetvoltage, chargingcurrent
     , arrayvoltage, arraycurrent, outputpower, sweepvmp, sweepvoc, sweeppmax
     , batterytemp, controllertemp, kilowatthours, status, absorption, balance
     , controllerfloat, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily
     , maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage
-    , batterysensorvoltage, locationtemp, locationcloud, recordid))    
+    , batterysensorvoltage, locationtemp, locationcloud, productiontoday, productiontomorrow, recordid))    
         connection.commit()    
     except Exception as e: 
         print(e)
@@ -53,16 +67,22 @@ async def update_data(recordid, batteryvoltage, targetvoltage, chargingcurrent
     return
 
 #update cache stats
-def update_cache(recordid, lastweather):
+def update_cache(recordid, type, cachedata):
 
     connection = sqlite3.connect(database, isolation_level=None)
     cur = connection.cursor()
     try:
         with connection:
-            cur = connection.cursor()
-            connection.execute('pragma journal_mode=wal')
-            sql1 = '''UPDATE cache SET (lastweather) = (?) WHERE id = ?'''
-            s1 = cur.execute(sql1, (lastweather, recordid))    
+            if type == 'weather':
+                cur = connection.cursor()
+                connection.execute('pragma journal_mode=wal')
+                sql1 = '''UPDATE cache SET (lastweather) = (?) WHERE id = ?'''
+                s1 = cur.execute(sql1, (cachedata, recordid))    
+            if type == 'solar':
+                cur = connection.cursor()
+                connection.execute('pragma journal_mode=wal')
+                sql1 = '''UPDATE cache SET (lastsolar) = (?) WHERE id = ?'''
+                s1 = cur.execute(sql1, (cachedata, recordid))   
         connection.commit()    
     except Exception as e: 
         print(e)
@@ -75,27 +95,37 @@ def read_cache():
     cur = connection.cursor()
     try:
         rows = cur.execute(
-            "SELECT lastweather FROM cache WHERE id = ?",
+            "SELECT lastweather, lastsolar FROM cache WHERE id = ?",
             (0,),
         ).fetchall()
         lastweather = rows[0][0]
-        return lastweather                
+        lastsolar = rows[0][1]
+        return lastweather, lastsolar                
     except Exception as e:
         print(e)
     return
 
 #load data from database
-def load_data():
+def load_data(type):
     connection = sqlite3.connect(database)
     cur = connection.cursor()
     try:
-        rows = cur.execute(
-            '''SELECT locationtemp, locationcloud FROM tristar WHERE id = ?''',
-            (0,),
-        ).fetchall()
-        locationtemp = rows[0][0]
-        locationcloud = rows[0][1]
-        return locationtemp, locationcloud
+        if type == 'weather':
+            rows = cur.execute(
+                '''SELECT locationtemp, locationcloud FROM tristar WHERE id = ?''',
+                (0,),
+            ).fetchall()
+            locationtemp = rows[0][0]
+            locationcloud = rows[0][1]
+            return locationtemp, locationcloud
+        if type == 'solar':
+            rows = cur.execute(
+                '''SELECT productiontoday, productiontomorrow FROM tristar WHERE id = ?''',
+                (0,),
+            ).fetchall()
+            productiontoday = rows[0][0]
+            productiontomorrow = rows[0][1]
+            return productiontoday, productiontomorrow            
     except Exception as e:
         print(e)
     return
@@ -113,19 +143,34 @@ async def scrape_and_update():
         locationtemp = 'n/a'
         locationcloud = 'n/a'
         webserverfound = ''
+        productiontoday = 'n/a'
+        productiontomorrow = 'n/a'
         timenow = int(time.time()) 
-        lastweather = read_cache()
-        #check cache age, update if old
-        if (timenow - int(lastweather)) > 350:
-            try:
-                locationtemp, locationcloud = get_weather()
-                update_cache(recordid, timenow)
-                print('cache is old, fetching new weather data')
-            except Exception as e:
-                print(e)   
-        else:
-            locationtemp, locationcloud = load_data()
-            print('using cached weather data')
+        lastweather, lastsolar = read_cache()
+        if weather.upper() == 'ON':
+            #check cache age, update if old
+            if (timenow - int(lastweather)) > 350:
+                try:
+                    locationtemp, locationcloud = get_weather()
+                    update_cache(recordid, 'weather', timenow)
+                    print('cache is old, fetching new weather data')
+                except Exception as e:
+                    print(e)   
+            else:
+                locationtemp, locationcloud = load_data('weather')
+                print('using cached weather data')
+        if solarproduction.upper() == 'ON':
+        #check solar production cache and update if old
+            if (timenow - int(lastsolar)) > 950:
+                try:
+                    productiontoday, productiontomorrow = get_solar()
+                    update_cache(recordid, 'solar', timenow)
+                    print('cache is old, fetching new solar data')
+                except Exception as e:
+                    print(e)   
+            else:
+                productiontoday, productiontomorrow = load_data('solar')
+                print('using cached solar data')            
         try:
             webserver_status = check_webserver(controllerphppath)   
         except Exception as e:
@@ -174,7 +219,7 @@ async def scrape_and_update():
         , batterytemp, controllertemp, kilowatthours, status, absorption, balance
         , controllerfloat, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily
         , maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage
-        , batterysensorvoltage, locationtemp, locationcloud)
+        , batterysensorvoltage, locationtemp, locationcloud, productiontoday, productiontomorrow)
  
     except Exception as e:
       print(e)   

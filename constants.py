@@ -4,6 +4,9 @@ controllerphppath = 'http://192.168.50.40/controller.php'
 database = './controller.db'
 #please ensure chrome is installed and the correct directory set here
 chromepath = '/usr/bin/google-chrome'
+#enable weather and solar production by changing to 'on'
+weather = 'off'
+solarproduction = 'off'
 
 #physical location of solar installation - for live weather data and estimated production
 #change from 'n/a' to enable
@@ -21,6 +24,7 @@ azimuth = 'n/a'
 kwatts_production = 'n/a'
 
 weatherapiurl_base = 'https://api.met.no/weatherapi/locationforecast/2.0/compact?'
+solarapiurl_base = 'https://api.forecast.solar/estimate/'
 
 batteryvoltagediv = 'body > div:nth-child(1)'
 targetvoltagediv = 'body > div:nth-child(2)'
