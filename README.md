@@ -2,6 +2,8 @@
 
 Useful for convenient access with smart home systems, graphing, logging, etc. Should work with most, if not all, [MorningStar](https://www.morningstarcorp.com/) products. It is recommended to use a webserver and proxy the traffic to flask and to your solar controller.  
 
+_Able to connect with weather and solar forecast APIs in order to predict future solar production. Disabled by default_
+
 Requires any webserver (with php), pyppeteer, flask, waitress (pip) and chrome or chromium.  
 
 Edit ip_tristar="ip:port" and point to your solar charger, in controller.php  
