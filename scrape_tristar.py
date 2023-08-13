@@ -136,7 +136,7 @@ async def get_value(page, div):
     title = await page.evaluate('(element) => element.textContent', element)
     value = title.partition(':')[2]
     return value
-
+#scrape data and push updates
 async def scrape_and_update():
     try:
         recordid = 0

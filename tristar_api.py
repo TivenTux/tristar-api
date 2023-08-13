@@ -51,7 +51,7 @@ def load_data():
     except Exception as e:
         print(e)
     return batteryvoltage, targetvoltage, chargingcurrent, arrayvoltage, arraycurrent, outputpower, sweepvmp, sweepvoc, sweeppmax, batterytemp, controllertemp, kilowatthours, status, absorptionduration, balanceduration, floatduration, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily, maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage, batterysensorvoltage, locationtemp, locationcloud, productiontoday, productiontomorrow
-
+#convert temperature to fahrenheit if directed by conf option
 def convert_to_fahrenheit(temperature):
     temperature = temperature.replace('C', '')
     temperature = "{:.2f}".format((float(temperature) * 1.8) + 32) + 'F'
@@ -65,21 +65,20 @@ def tristarclean():
     availableitems = [batteryvoltage, targetvoltage, chargingcurrent, arrayvoltage, arraycurrent, outputpower, sweepvmp, sweepvoc, sweeppmax, batterytemp, controllertemp, kilowatthours, status, absorptionduration, balanceduration, floatduration, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily, maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage, batterysensorvoltage, locationtemp, locationcloud, productiontoday, productiontomorrow]    
     nolabelitems = []
     x = 0
-    #remove measurement labels except specific items
+    #remove measurement symbols except specific items
     for i in availableitems:
         dont_alter = [23, 12, 13, 14, 15]
         if x not in dont_alter:
             i = re.sub('[^\d\.]', '', i)
         nolabelitems.append(i)
         x += 1
-    cleandump = ({'Battery Voltage': nolabelitems[0], 'Target Voltage': nolabelitems[1], 'Charging Current': nolabelitems[2],
+    return jsonify(({'Battery Voltage': nolabelitems[0], 'Target Voltage': nolabelitems[1], 'Charging Current': nolabelitems[2],
                     'Array Voltage': nolabelitems[3], 'Array Current': nolabelitems[4], 'Output Power': nolabelitems[5],
                     'Sweep Vmp': nolabelitems[6], 'Sweep Voc': nolabelitems[7], 'Sweep Pmax': nolabelitems[8], 'Battery Temperature': nolabelitems[9], 'Controller Temperature': nolabelitems[10],
                     'Kilowatt Hours': nolabelitems[11], 'Controller Status': nolabelitems[12], 'Absorption': nolabelitems[13], 'Equalization': nolabelitems[14],  'Float': nolabelitems[15], 
                     'Max Energy daily': nolabelitems[16], 'Ampere Hours daily': nolabelitems[17], 'Watt Hours daily': nolabelitems[18], 'Max Voltage daily': nolabelitems[19],  
                     'Max Battery Voltage daily': nolabelitems[20], 'Min Battery Voltage daily': nolabelitems[21], 'Input Power': nolabelitems[22], 'LED Status': nolabelitems[23],
-                    'Battery Poles Voltage': nolabelitems[24], 'Battery Sensor Voltage': nolabelitems[25], 'Temperature': nolabelitems[26], 'Cloud Cover': nolabelitems[27], 'Production Today': nolabelitems[28], 'Production Tomorrow': nolabelitems[29]})
-    return cleandump
+                    'Battery Poles Voltage': nolabelitems[24], 'Battery Sensor Voltage': nolabelitems[25], 'Temperature': nolabelitems[26], 'Cloud Cover': nolabelitems[27], 'Production Today': nolabelitems[28], 'Production Tomorrow': nolabelitems[29]}))
 
 @app.route('/tristar', methods=['GET'])
 #tristar endpoint
@@ -100,4 +99,5 @@ def tristar():
 
 #app.run(host='0.0.0.0', port=5715)
 
+#serve gateway interface on port 5715
 serve(app, host="0.0.0.0", port=5715)
