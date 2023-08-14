@@ -2,7 +2,7 @@
 <?php
 $ip_tristar="ip:port";
 
-$klice=array(
+$calls=array(
     "Battery Voltage"  =>array("38","V"),
     "Target Voltage"   =>array("51","V"),
 	"Charging Current"  =>array("39","A"),
@@ -34,11 +34,11 @@ $klice=array(
 function get_data($ip,$alo) {
 	if (($handle = fopen("http://".$ip."/MBCSV.cgi?ID=1&F=4&AHI=0&ALO=".$alo."&RHI=0&RLO=1", "r")) !== FALSE) {
     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-			$hodnota[1]=$data[3];  
-			$hodnota[2]=$data[4];     }
+			$u_value[1]=$data[3];  
+			$u_value[2]=$data[4];     }
     fclose($handle);
 }
-Return $hodnota;
+Return $u_value;
 }
 
 
@@ -52,80 +52,76 @@ return $scale_factor;
 }
 
 
+function get_scaled_value($raw_data,$tristar_unit,$vscale,$iscale){
 
-function get_scaled_value($raw_data,$jednotka,$vscale,$iscale){
-
-switch ($jednotka) {
+switch ($tristar_unit) {
 	case "V":
-	$hodnota=$raw_data[1]*256+$raw_data[2];
-	$vysledek=(($hodnota*$vscale)/32768)/10;
+	$u_value=$raw_data[1]*256+$raw_data[2];
+	$result=(($u_value*$vscale)/32768)/10;
 	break;
 	
 	case "A":
-	$hodnota=$raw_data[1]*256+$raw_data[2];
-	$vysledek=(($hodnota*$iscale)/32768)/10;	
+	$u_value=$raw_data[1]*256+$raw_data[2];
+	$result=(($u_value*$iscale)/32768)/10;	
 	break;
 	
 	case "W":	
-	$hodnota=$raw_data[1]*256+$raw_data[2];
-	$vysledek=(($hodnota*$vscale*$iscale)/131072)/100;
+	$u_value=$raw_data[1]*256+$raw_data[2];
+	$result=(($u_value*$vscale*$iscale)/131072)/100;
 	break;
 	
 	case "C":	
-	$vysledek=$raw_data[2];
+	$result=$raw_data[2];
 	break;
 	
 	case "kWh":	
-	$vysledek=$raw_data[2];
+	$result=$raw_data[2];
 	break;
 	
 	case "min":	
-	$vysledek=($raw_data[1]*256+$raw_data[2])/60;
+	$result=($raw_data[1]*256+$raw_data[2])/60;
 	break;
 	
 	case "Ah":	
-	$vysledek=($raw_data[1]*256+$raw_data[2])*0.1;
+	$result=($raw_data[1]*256+$raw_data[2])*0.1;
 	break;
 
 	case "Wh":	
-	$vysledek=($raw_data[1]*256+$raw_data[2]);
+	$result=($raw_data[1]*256+$raw_data[2]);
 	break;
     
 	case "LED":
-	$vysledek=$raw_data[2];
+	$result=$raw_data[2];
 
 	$led_state = Array(	"LED_START","LED_START2","LED_BRANCH","Fast blinking green ","Slow blinking Green ","1 blink per second Green ",
 	"Lights Green ","Light Green Yellow","Lights Yellow ","UNDEFINED","Blinking Red ","Lights Red","R-Y-G ERROR","R/Y-G ERROR","R/G-Y ERROR",
 	"R-Y ERROR (HTD)","R-G ERROR (HVD)","R/Y-G/Y ERROR","G/Y/R ERROR","G/Y/R x 2");
-	$vysledek=$led_state[$vysledek];
+	$result=$led_state[$result];
 	break;
 	
 	default:
-	$vysledek=$raw_data[2];
+	$result=$raw_data[2];
 	$charge_state = Array("Start","Night Check","Disconnect","Night","Fault","MPPT","Absorption","Float","Equalize","Slave");
-	$vysledek=$charge_state[$vysledek];
+	$result=$charge_state[$result];
 	break;
 	
 }
-if(is_numeric($vysledek)) {
-return round($vysledek,2);} else {
-return $vysledek;
+if(is_numeric($result)) {
+return round($result,2);} else {
+return $result;
 }
 }
   
 
-
-  
-  
 $vscale=get_scale($ip_tristar,0);
 $iscale=get_scale($ip_tristar,2);
 
 
-foreach($klice as $polozka=>$hodnota)
+foreach($calls as $data_record=>$u_value)
   {
-  list($alo,$jednotka)=$hodnota;
+  list($alo,$tristar_unit)=$u_value;
   $raw_data=get_data($ip_tristar,$alo);
-  echo "<div>" . $polozka . ":" . get_scaled_value($raw_data,$jednotka,$vscale,$iscale).$jednotka."</div>";
+  echo "<div>" . $data_record . ":" . get_scaled_value($raw_data,$tristar_unit,$vscale,$iscale).$tristar_unit."</div>";
   }
 
 
