@@ -1,6 +1,6 @@
 # REST API for MorningStar solar charging controllers
 
-Useful for interfacing with smart home systems, graphing, logging, etc. Made for Tristar product category but should work with most, if not all [MorningStar](https://www.morningstarcorp.com/) products. 
+Useful for interfacing with smart home systems, graphing, logging, etc. Made for Tristar product category but should also work with most, if not all [MorningStar](https://www.morningstarcorp.com/) products. 
 
 Set env variable **TRISTAR_ADDRESS** with the address of your solar charging controller(ip:port)<br>
 
