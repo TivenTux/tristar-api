@@ -1,28 +1,13 @@
-# REST API for tristar solar controllers
+# REST API for MorningStar solar charging controllers
 
-Useful for convenient access with smart home systems, graphing, logging, etc. Should work with most, if not all, [MorningStar](https://www.morningstarcorp.com/) products. It is recommended to use a webserver and proxy the traffic to flask and to your solar controller.  
+Useful for interfacing with smart home systems, graphing, logging, etc. Made for Tristar product category but should work with most, if not all [MorningStar](https://www.morningstarcorp.com/) products. 
 
-_Able to connect with weather and solar forecast APIs in order to predict future solar production. Disabled by default_
-_Edit constants.py to set the configuration options_
+Set env variable **TRISTAR_ADDRESS** with the address of your solar charging controller(ip:port)<br>
 
-Requires any webserver (with php), pyppeteer, flask, waitress (pip) and chrome or chromium.  
+install:<br>
+**docker compose up**
 
-Edit ip_tristar="ip:port" and point to your solar charger, in controller.php  
-Edit controllerphppath in constants.py, to point to your webserver that is hosting controller.php  
+**provides api endpoint under ``http://your_IP:8081/tristar`` with the following items:<br>
 
-Run scrape_tristar.py with cron, on the frequency you need to update the data.  
-
-tristar_api.py will provide api endpoint under ``http://your_IP:5715/tristar``  
-
-
-### kernel
-some distros might need this for chrome sandbox support on kernel 
-```sh
-$ sudo sysctl -w kernel.unprivileged_userns_clone=1
-```
-
-### deps
-for chrome
-```sh
-$ sudo apt install gconf-service libasound2 libatk1.0-0 libatk-bridge2.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
-```
+__Absorption,Ampere Hours daily, Array Current, Array Voltage, Battery Poles Voltage, Battery Sensor Voltage, Battery Temperature, Battery Voltage, Charging Current, Cloud Cover, Controller Status, Controller Temperature, Equalization, Float, Input Power, Kilowatt Hours, LED Status, Max Battery Voltage daily, Max Energy daily, Max Voltage daily, Min Battery Voltage daily, Output Power, Production Today, Production Tomorrow,
+ Sweep Pmax, Sweep Vmp, Sweep Voc, Target Voltage, Temperature, Watt Hours daily__
