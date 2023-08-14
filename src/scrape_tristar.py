@@ -1,15 +1,25 @@
-import time, os, random, requests, json, asyncio
+import time
+import os
+import requests
+import json
+import asyncio
 from datetime import datetime, timedelta
-import urllib.request, sqlite3
+import sqlite3
 from pyppeteer import launch
 from constants import *
 
 #check if webserver is running
 def check_webserver(url):
+    '''
+    Checks url and finds webserver status
+    '''
     return requests.head(url, timeout=5).status_code < 400
 
 #fetch weather data
 def get_weather():
+    '''
+    Returns weather data according to gps coordinates in conf
+    '''
     try:
         if lat == 'n/a' or lon == 'n/a':
             return 'n/a', 'n/a'
@@ -22,6 +32,9 @@ def get_weather():
 
 #get solar production data
 def get_solar():
+    '''
+    Calculates future estimated solar production according to various options set in conf.
+    '''
     try:
         if lat == 'n/a' or lon == 'n/a' or azimuth == 'n/a' or kwatts_production == 'n/a' or declination == 'n/a':
             return 'n/a', 'n/a'
@@ -42,6 +55,9 @@ async def update_data(recordid, batteryvoltage, targetvoltage, chargingcurrent
     , maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage
     , batterysensorvoltage, locationtemp, locationcloud, productiontoday, productiontomorrow):
 
+    '''
+    Takes all available scraped data and pushes to the database
+    '''
     connection = sqlite3.connect(database, isolation_level=None)
     cur = connection.cursor()
     try:
@@ -68,7 +84,9 @@ async def update_data(recordid, batteryvoltage, targetvoltage, chargingcurrent
 
 #update cache stats
 def update_cache(recordid, type, cachedata):
-
+    '''
+    Caches weather and solar production data to make it easier on the APIs.
+    '''
     connection = sqlite3.connect(database, isolation_level=None)
     cur = connection.cursor()
     try:
@@ -91,6 +109,9 @@ def update_cache(recordid, type, cachedata):
 
 #access cache data
 def read_cache():
+    '''
+    Loads cached solar and weather data.
+    '''
     connection = sqlite3.connect(database)
     cur = connection.cursor()
     try:
@@ -107,6 +128,9 @@ def read_cache():
 
 #load data from database
 def load_data(type):
+    '''
+    Loads data from the database
+    '''
     connection = sqlite3.connect(database)
     cur = connection.cursor()
     try:
@@ -132,12 +156,18 @@ def load_data(type):
 
 #scrape php page
 async def get_value(page, div):
+    '''
+    Takes page, css div and returns scraped value.
+    '''
     element = await page.querySelector(div)
     title = await page.evaluate('(element) => element.textContent', element)
     value = title.partition(':')[2]
     return value
 #scrape data and push updates
 async def scrape_and_update():
+    '''
+    Scrapes data and calls functions to update db.
+    '''
     try:
         recordid = 0
         locationtemp = 'n/a'
