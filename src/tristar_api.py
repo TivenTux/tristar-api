@@ -1,10 +1,15 @@
-import json, sqlite3, re
+import json
+import sqlite3
+import re
 from flask import Flask, jsonify
-from constants import *
 from waitress import serve
+from constants import *
 
 #fetch latest data from database
 def load_data():
+    '''
+    Fetches all latest data from the database and returns it.
+    '''
     connection = sqlite3.connect(database)
     cur = connection.cursor()
     try:
@@ -61,6 +66,9 @@ app = Flask(__name__)
 #endpoint without measurement symbols
 @app.route('/tristarclean' , methods=['GET'])
 def tristarclean():
+    '''
+    Calls functions to load data and returns data to endpoint
+    '''
     batteryvoltage, targetvoltage, chargingcurrent, arrayvoltage, arraycurrent, outputpower, sweepvmp, sweepvoc, sweeppmax, batterytemp, controllertemp, kilowatthours, status, absorptionduration, balanceduration, floatduration, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily, maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage, batterysensorvoltage, locationtemp, locationcloud, productiontoday, productiontomorrow = load_data()
     availableitems = [batteryvoltage, targetvoltage, chargingcurrent, arrayvoltage, arraycurrent, outputpower, sweepvmp, sweepvoc, sweeppmax, batterytemp, controllertemp, kilowatthours, status, absorptionduration, balanceduration, floatduration, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily, maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage, batterysensorvoltage, locationtemp, locationcloud, productiontoday, productiontomorrow]    
     nolabelitems = []
@@ -83,6 +91,9 @@ def tristarclean():
 @app.route('/tristar', methods=['GET'])
 #tristar endpoint
 def tristar():
+    '''
+    Calls functions to load data and returns data to endpoint
+    '''
     batteryvoltage, targetvoltage, chargingcurrent, arrayvoltage, arraycurrent, outputpower, sweepvmp, sweepvoc, sweeppmax, batterytemp, controllertemp, kilowatthours, status, absorptionduration, balanceduration, floatduration, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily, maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage, batterysensorvoltage, locationtemp, locationcloud, productiontoday, productiontomorrow = load_data()
     if weather.upper() == 'ON' and temppreference.upper() == 'F':
         controllertemp = convert_to_fahrenheit(controllertemp)
