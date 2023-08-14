@@ -1,0 +1,42 @@
+version: "3"
+services:
+  pythonapp:
+    build: ./src/api/
+    ports: 
+      - "8081:5715"
+    networks:
+      - internal
+    volumes:
+      - ./src/db/:/api/db
+    command: python3 tristar_api.py
+  python_scraper:
+    build: ./src/scrape_data/
+    depends_on:
+      - nginx
+      - php
+    networks:
+      - internal
+    links:
+      - nginx
+    volumes:
+      - ./src/db/:/scrape/db
+    command: python3 scrape_tristar.py
+  nginx:
+    build:
+      context: .
+      dockerfile: src/nginx/Dockerfile
+    networks:
+      - internal
+    volumes:
+      - ./src/data/:/var/www/html/
+  php:
+    image: php:fpm-alpine
+    networks:
+      - internal
+    volumes:
+      - ./src/data/:/var/www/html/
+    environment:
+      TRISTAR_ADDRESS: ${TRISTAR_ADDRESS}
+networks:
+  internal:
+    driver: bridge
