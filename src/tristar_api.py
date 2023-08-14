@@ -1,4 +1,3 @@
-import json
 import sqlite3
 import re
 from flask import Flask, jsonify
@@ -58,6 +57,9 @@ def load_data():
     return batteryvoltage, targetvoltage, chargingcurrent, arrayvoltage, arraycurrent, outputpower, sweepvmp, sweepvoc, sweeppmax, batterytemp, controllertemp, kilowatthours, status, absorptionduration, balanceduration, floatduration, maxenergydaily, amperehoursdaily, watthoursdaily, maxvoltagedaily, maxbatteryvoltagedaily, minbatteryvoltagedaily, inputpower, led, batterypolesvoltage, batterysensorvoltage, locationtemp, locationcloud, productiontoday, productiontomorrow
 #convert temperature to fahrenheit if directed by conf option
 def convert_to_fahrenheit(temperature):
+    '''
+    Takes temperature in C, returns to Fahrenheit.
+    '''
     temperature = temperature.replace('C', '')
     temperature = "{:.2f}".format((float(temperature) * 1.8) + 32) + 'F'
     return temperature
