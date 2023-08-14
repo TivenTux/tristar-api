@@ -211,7 +211,7 @@ async def scrape_and_update():
             print('webserver error or phppath incorrect')
             return
         #please ensure chrome is installed and the correct directory set in constants
-        browser = await launch(executablePath=chromepath, headless=True, args= [])
+        browser = await launch(executablePath=chromepath, headless=True, args= ['--no-sandbox'])
         page = await browser.newPage() 
         ##await page.setUserAgent(pypp_user_agent);  
         await page.goto(controllerphppath, {"waitUntil" : ["load","domcontentloaded","networkidle2"], "timeout" : 8000}) 
