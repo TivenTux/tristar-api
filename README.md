@@ -12,6 +12,7 @@ $ docker compose --env-file .env
 ```
 This file path is relative to the current working directory where the Docker Compose command is executed.
 
+
 ## Running the container
 
 After cloning this repository, you can run
@@ -25,3 +26,6 @@ Will provide API endpoint at **``http://your_IP:8081/tristar``** with the follow
 
 *Absorption,Ampere Hours daily, Array Current, Array Voltage, Battery Poles Voltage, Battery Sensor Voltage, Battery Temperature, Battery Voltage, Charging Current, Cloud Cover, Controller Status, Controller Temperature, Equalization, Float, Input Power, Kilowatt Hours, LED Status, Max Battery Voltage daily, Max Energy daily, Max Voltage daily, Min Battery Voltage daily, Output Power, Production Today, Production Tomorrow,
  Sweep Pmax, Sweep Vmp, Sweep Voc, Target Voltage, Temperature, Watt Hours daily*
+
+
+Endpoint ``http://your_IP:8081/tristarclean`` will provide the items without measuring symbols.
